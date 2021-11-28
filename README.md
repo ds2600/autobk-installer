@@ -1,12 +1,11 @@
 # autobk2-installer
 
 ## What is it?
-Automatically installs AutoBk and AutoBk-GUI, includes the following packages:
-- Python 3.8
-- PIP 3.8
-- BeautifulSoup4
+Automatically installs AutoBk as a systemd service and AutoBk-GUI, includes the following packages:
+- Python 3
+- PIP 3 and several Python dependencies
 - Apache
-- PHP 7.4
+- PHP 7.4 and several PHP modules
 - MariaDB *(optional)*
 
 ## Where can I use it?
@@ -40,8 +39,8 @@ chmod +x install.sh
 - Default web username and password:
   - **Username:** administrator
   - **Password:** administrator
-   
+- uninstall.sh
+  - This script is used to remove all packages and files created by the autobk2-installer. It will remove all backups and database data. Unlike **install.sh**, this script is interactive and does require user input.    
    
 ## Known Bugs
 - Known issue on initial GUI install with 'Reports' and 'Logs' not being generated properly, this will be a fix in CAB-GUI
-- AutoBk script not installing
