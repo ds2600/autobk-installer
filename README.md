@@ -44,3 +44,4 @@ chmod +x install.sh
    
 ## Known Bugs
 - Known issue on initial GUI install with 'Reports' and 'Logs' not being generated properly, this will be a fix in CAB-GUI
+- After installation complete, autobk.service must be restarted
