@@ -49,6 +49,8 @@ fi
 # Get .env file
 if [ -f $SCRIPT_DIR/.env ]; then
     source $SCRIPT_DIR/.env
+else
+    echo "You forgot the .env file!"; exit;
 fi
 
 mkdir $SCRIPT_LOCATION
