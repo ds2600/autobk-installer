@@ -17,9 +17,9 @@ DB_ROOT_P=$( echo $RANDOM | md5sum | head -c 24 )
 configure() {
    local ARG_FIX=$( echo "$3" | sed 's/\//\\\//g' )
    if [ $1 == 'autobk' ]; then
-     sed -i 's/{'"$2"'}/'"$ARG_FIX"'/' ${SCRIPT_LOCATION}autobk/autobk.ini > $SCRIPT_DIR/install.log 2>&1
+     sed -i 's/{'"$2"'}/'"$ARG_FIX"'/' ${SCRIPT_LOCATION}autobk/autobk.ini >> $SCRIPT_DIR/install.log 2>&1
    else
-     sed -i 's/{'"$2"'}/'"$ARG_FIX"'/' $GUI_LOCATION$CFG_LOCATION > $SCRIPT_DIR/install.log 2>&1
+     sed -i 's/{'"$2"'}/'"$ARG_FIX"'/' $GUI_LOCATION$CFG_LOCATION >> $SCRIPT_DIR/install.log 2>&1
    fi
 }
 
@@ -57,7 +57,7 @@ mkdir $SCRIPT_LOCATION
 
 # Install required packages
 echo -e "Updating Apt packages"
-/usr/bin/apt update -y > $SCRIPT_DIR/install.log 2>&1 &
+/usr/bin/apt update -y >> $SCRIPT_DIR/install.log 2>&1 &
 spin
 
 echo -e "\nInstalling Apache2 web server"
@@ -77,15 +77,15 @@ echo -e "\nInstalling Python & Requirements"
 autobk-install python3
 autobk-install python3-pip
 # Install Python dependencies
-pip3 install beautifulsoup4 > $SCRIPT_DIR/install.log 2>&1 &
+pip3 install beautifulsoup4 >> $SCRIPT_DIR/install.log 2>&1 &
 spin
-pip3 install easysnmp > $SCRIPT_DIR/install.log 2>&1 &
+pip3 install easysnmp >> $SCRIPT_DIR/install.log 2>&1 &
 spin
-pip3 install mysql-connector-python > $SCRIPT_DIR/install.log 2>&1 &
+pip3 install mysql-connector-python >> $SCRIPT_DIR/install.log 2>&1 &
 spin
-pip3 install pyOpenSSL > $SCRIPT_DIR/install.log 2>&1 &
+pip3 install pyOpenSSL >> $SCRIPT_DIR/install.log 2>&1 &
 spin
-pip3 install simplejson > $SCRIPT_DIR/install.log 2>&1 &
+pip3 install simplejson >> $SCRIPT_DIR/install.log 2>&1 &
 spin
 
 # Install MariaDB server unless specified in .env
@@ -95,18 +95,18 @@ if [ $INSTALL_DB == "yes" ]; then
 
 	echo -e "\nConfiguring MariaDB"
 	# Set root password, delete anonymous users, delete remote root, delete test database, flush privileges
-	mysql -sfu root -Bse "UPDATE mysql.user SET Password=PASSWORD('${DB_ROOT_P}') WHERE User='root';DELETE FROM mysql.user WHERE User='';DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');DROP DATABASE IF EXISTS test;DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';FLUSH PRIVILEGES;" > $SCRIPT_DIR/install.log 2>&1 &
+	mysql -sfu root -Bse "UPDATE mysql.user SET Password=PASSWORD('${DB_ROOT_P}') WHERE User='root';DELETE FROM mysql.user WHERE User='';DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');DROP DATABASE IF EXISTS test;DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';FLUSH PRIVILEGES;" >> $SCRIPT_DIR/install.log 2>&1 &
 	spin
 	
 	# Create user as designated in the .env file
-	mysql -u root -p$DB_ROOT_P -Bse "CREATE USER '${SQL_UN}'@localhost IDENTIFIED BY '${SQL_PASS}';GRANT ALL PRIVILEGES ON *.* TO '${SQL_UN}'@localhost IDENTIFIED BY '${SQL_PASS}';FLUSH PRIVILEGES;" > $SCRIPT_DIR/install.log 2>&1 &
+	mysql -u root -p$DB_ROOT_P -Bse "CREATE USER '${SQL_UN}'@localhost IDENTIFIED BY '${SQL_PASS}';GRANT ALL PRIVILEGES ON *.* TO '${SQL_UN}'@localhost IDENTIFIED BY '${SQL_PASS}';FLUSH PRIVILEGES;" >> $SCRIPT_DIR/install.log 2>&1 &
 	spin
 
 	# Create the AutoBk Database
 	echo "CREATE DATABASE AutoBk;" | mysql -u $SQL_UN -p$SQL_PASS
 	
 	# Get the latest AutoBK SQL and load it
-	wget --no-cache $SQL_GET_URL > $SCRIPT_DIR/install.log 2>&1 &
+	wget --no-cache $SQL_GET_URL >> $SCRIPT_DIR/install.log 2>&1 &
 	spin
 	mysql -u $SQL_UN -p$SQL_PASS AutoBk < $SCRIPT_DIR/autobk-installer.sql &
 	spin
@@ -123,9 +123,9 @@ autobk-install unzip
 
 # Get newest version of AutoBk and unzip it
 echo -e "\nSetting up AutoBk"
-wget --no-cache $AB_GET_URL > $SCRIPT_DIR/install.log 2>&1 &
+wget --no-cache $AB_GET_URL >> $SCRIPT_DIR/install.log 2>&1 &
 spin
-unzip autobk.zip -d ${SCRIPT_LOCATION}autobk/ > $SCRIPT_DIR/install.log 2>&1 &
+unzip autobk.zip -d ${SCRIPT_LOCATION}autobk/ >> $SCRIPT_DIR/install.log 2>&1 &
 spin
 
 # Modify AutoBk .ini to match .env
@@ -151,18 +151,18 @@ echo '[Install]' >> /etc/systemd/system/autobk.service
 echo 'WantedBy=multi-user.target' >> /etc/systemd/system/autobk.service
 
 # Reload systemd and enable autobk.service
-systemctl daemon-reload > $SCRIPT_DIR/install.log 2>&1
+systemctl daemon-reload >> $SCRIPT_DIR/install.log 2>&1
 sleep 5
-systemctl enable autobk.service > $SCRIPT_DIR/install.log 2>&1
+systemctl enable autobk.service >> $SCRIPT_DIR/install.log 2>&1
 sleep 5
 echo -e "Starting AutoBk"
-systemctl start autobk.service > $SCRIPT_DIR/install.log 2>&1
+systemctl start autobk.service >> $SCRIPT_DIR/install.log 2>&1
 
 # Get newest version of AutoBk-GUI and unzip it
 echo -e "Setting up AutoBk web interface"
-wget --no-cache $GUI_GET_URL > $SCRIPT_DIR/install.log 2>&1 &
+wget --no-cache $GUI_GET_URL >> $SCRIPT_DIR/install.log 2>&1 &
 spin
-unzip cabgui.zip -d $GUI_LOCATION > $SCRIPT_DIR/install.log 2>&1 &
+unzip cabgui.zip -d $GUI_LOCATION >> $SCRIPT_DIR/install.log 2>&1 &
 spin
 
 # Copy example GUI configuration file
@@ -182,7 +182,7 @@ configure gui 'smtpfrom' $SMTP_FROM
 configure gui 'smtpemail' $SMTP_EMAIL
 
 # Disable the default virtual host
-a2dissite 000-default > $SCRIPT_DIR/install.log 2>&1
+a2dissite 000-default >> $SCRIPT_DIR/install.log 2>&1
 
 # Add new directory permissions and WWW directory to virtual conf
 GUI_NOSLASH=$( echo "$GUI_LOCATION" | sed 's/\//\\\//g' )
@@ -194,10 +194,10 @@ sed -i '5i<\/Directory> ' /etc/apache2/sites-available/000-default.conf
 sed -i 's/\/var\/www\/html/'"$GUI_NOSLASH"'www/' /etc/apache2/sites-available/000-default.conf > $SCRIPT_DIR/install.log 2>&1
 chown -R www-data:www-data $GUI_LOCATION
 chmod -R 755 $GUI_LOCATION
-a2ensite 000-default > $SCRIPT_DIR/install.log 2>&1
+a2ensite 000-default >> $SCRIPT_DIR/install.log 2>&1
 
 echo -e "\nRestarting Apache"
-systemctl reload apache2 > $SCRIPT_DIR/install.log 2>&1
+systemctl reload apache2 >> $SCRIPT_DIR/install.log 2>&1
 
 echo -e "Remove downloaded files"
 rm -f $SCRIPT_DIR/autobk-installer.sql

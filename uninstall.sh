@@ -22,36 +22,40 @@ if [ -f $SCRIPT_DIR/.env ]; then
     source $SCRIPT_DIR/.env
 fi
 
-echo -e "\n############\n" >> $SCRIPT_DIR/uninstall.log
+autobk-remove() {
+    /usr/bin/apt purge -y $1 >> $SCRIPT_DIR/uninstall.log 2>&1
+}
 
 # Install required packages
 echo -e "Uninstalling Apache2 web server"
-/usr/bin/apt purge -y apache2 > $SCRIPT_DIR/uninstall.log 2>&1
+autobk-remove apache2
 
 echo -e "Uninstalling PHP & Requirements"
-/usr/bin/apt purge -y libapache2-mod-php7.4 php7.4 php7.4-common php7.4-curl php7.4-dev php7.4-gd php-pear php7.4-mysql > $SCRIPT_DIR/uninstall.log 2>&1
+autobk-remove libapache2-mod-php7.4
+autobk-remove php7.4
+autobk-remove php7.4-common
+autobk-remove php7.4-curl
+autobk-remove php7.4-dev
+autobk-remove php7.4-gd
+autobk-remove php-pear
+autobk-remove php7.4-mysql
+
 
 echo -e "Uninstalling MariaDB database"
-/usr/bin/apt-get purge -y mariadb-server > $SCRIPT_DIR/uninstall.log 2>&1
+autobk-remove mariadb-server
 /usr/bin/apt-get --purge autoremove -y mariadb-* 
 /usr/bin/apt-get --purge autoremove -y mysql-* 
 
-#mv /var/lib/mysql /var/lib/mysql_old
-#mv /etc/mysql /etc/mysql_old
-
 echo -e "Uninstalling Unzip"
-/usr/bin/apt purge -y unzip > $SCRIPT_DIR/uninstall.log 2>&1
+autobk-remove unzip
 
 echo -e "Removing AutoBk web interface"
-rm -f -R /cabgui/ > $SCRIPT_DIR/uninstall.log 2>&1
+rm -f -R ${GUI_LOCATION} > $SCRIPT_DIR/uninstall.log 2>&1
 rm -f -R cabgui.zip > $SCRIPT_DIR/uninstall.log 2>&1
-rm -f autobk-installer.sql > $SCRIPT_DIR/uninstall.log 2>&1
 rm -f install.log > $SCRIPT_DIR/uninstall.log 2>&1
 
 echo -e "Remove AutoBk"
-rm -f autobk.zip > $SCRIPT_DIR/uninstall.log 2>&1
-rm -f -R /backups/ > $SCRIPT_DIR/uninstall.log 2>&1
-systemctl disable autobk.service > $SCRIPT_DIR/uninstall.log 2>&1
+rm -f -R ${SCRIPT_LOCATION} > $SCRIPT_DIR/uninstall.log 2>&1
 rm -f /etc/systemd/system/autobk.service > $SCRIPT_DIR/uninstall.log 2>&1
 
 if [ $RM_ORPHAN_DEP == "yes" ]; then
