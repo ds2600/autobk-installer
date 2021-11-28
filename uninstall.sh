@@ -1,5 +1,11 @@
 #!/bin/bash
 
+read -p "Are you sure you want to run uninstall? This action is destructive and un-recoverable." -n 1 -r
+echo    # (optional) move to a new line
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    exit 1
+fi
 # Exit if there is an error
 set -e
 
@@ -19,28 +25,34 @@ fi
 echo -e "\n############\n" > $SCRIPT_DIR/uninstall.log
 
 # Install required packages
-echo -e "\nUninstalling Apache2 web server"
+echo -e "Uninstalling Apache2 web server"
 /usr/bin/apt purge -y apache2 > $SCRIPT_DIR/uninstall.log 2>&1
 
-echo -e "\nUninstalling PHP & Requirements"
+echo -e "Uninstalling PHP & Requirements"
 /usr/bin/apt purge -y libapache2-mod-php7.4 php7.4 php7.4-common php7.4-curl php7.4-dev php7.4-gd php-pear php7.4-mysql > $SCRIPT_DIR/uninstall.log 2>&1
 
-echo -e "\nUninstalling MySQL database"
-/usr/bin/apt purge -y mysql-server mysql-client > $SCRIPT_DIR/uninstall.log 2>&1
+echo -e "Uninstalling MariaDB database"
+/usr/bin/apt purge -y mariadb-server > $SCRIPT_DIR/uninstall.log 2>&1
+/usr/bin/apt --purge autoremove -y mariadb-* 
+/usr/bin/apt --purge autoremove -y mysql-* 
 
-echo -e "\nUninstalling Unzip"
+#mv /var/lib/mysql /var/lib/mysql_old
+#mv /etc/mysql /etc/mysql_old
+
+echo -e "Uninstalling Unzip"
 /usr/bin/apt purge -y unzip > $SCRIPT_DIR/uninstall.log 2>&1
 
-echo -e "\nRemoving AutoBk web interface"
-rm -R /cabgui/
-rm -R cabgui.zip
-rm install.log
+echo -e "Removing AutoBk web interface"
+rm -f -R /cabgui/ > $SCRIPT_DIR/uninstall.log 2>&1
+rm -f -R cabgui.zip > $SCRIPT_DIR/uninstall.log 2>&1
+rm -f autobk-installer.sql > $SCRIPT_DIR/uninstall.log 2>&1
+rm -f install.log > $SCRIPT_DIR/uninstall.log 2>&1
 
 if [ $RM_ORPHAN_DEP == "yes" ]; then
-        echo -e "\nRemoving orphaned packages"
+        echo -e "Removing orphaned packages"
         /usr/bin/apt autoremove -y > $SCRIPT_DIR/uninstall.log 2>&1
 else
-        echo -e "\nNot removing orphaned packages"
+        echo -e "Not removing orphaned packages per .env"
 fi
 
-echo -e "\nUninstallation complete"
+echo -e "Uninstallation complete"
