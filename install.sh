@@ -55,6 +55,8 @@ fi
 
 mkdir $SCRIPT_LOCATION
 
+echo -e "############### " && date >> $SCRIPT_DIR/install.log 2>&1
+
 # Install required packages
 echo -e "Updating Apt packages"
 /usr/bin/apt update -y >> $SCRIPT_DIR/install.log 2>&1 &
