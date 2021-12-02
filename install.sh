@@ -1,5 +1,16 @@
 #!/bin/bash
 
+cat << "EOF"
+                _        ____  _
+     /\        | |      |  _ \| |
+    /  \  _   _| |_ ___ | |_) | | __
+   / /\ \| | | | __/ _ \|  _ <| |/ /
+  / ____ \ |_| | || (_) | |_) |   <
+ /_/    \_\__,_|\__\___/|____/|_|\_\
+
+EOF
+
+
 # Exit if there is an error
 set -e
 
@@ -11,7 +22,6 @@ SQL_GET_URL="https://dev.ishiganto.com/autobk/autobk-installer.sql"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CFG_LOCATION="www/inc/config.php"
 DB_ROOT_P=$( echo $RANDOM | md5sum | head -c 24 )
-
 
 # configure() is used to enter .env variables into the AutoBk-GUI configuration file
 configure() {
@@ -74,6 +84,7 @@ autobk-install php7.4-dev
 autobk-install php7.4-gd
 autobk-install php-pear
 autobk-install php7.4-mysql
+autobk-install php7.4-ldap
 
 echo -e "\nInstalling Python & Requirements"
 autobk-install python3
@@ -187,6 +198,7 @@ configure gui 'smtpemail' $SMTP_EMAIL
 a2dissite 000-default >> $SCRIPT_DIR/install.log 2>&1
 
 # Add new directory permissions and WWW directory to virtual conf
+# Will probably eventually create designated AutoBk virtual host
 GUI_NOSLASH=$( echo "$GUI_LOCATION" | sed 's/\//\\\//g' )
 sed -i '1i<Directory '"$GUI_NOSLASH"'>' /etc/apache2/sites-available/000-default.conf
 sed -i '2iOptions Indexes FollowSymLinks' /etc/apache2/sites-available/000-default.conf
@@ -200,6 +212,16 @@ a2ensite 000-default >> $SCRIPT_DIR/install.log 2>&1
 
 echo -e "\nRestarting Apache"
 systemctl reload apache2 >> $SCRIPT_DIR/install.log 2>&1
+
+echo -e "\nAdding command line aliases"
+echo "source ${GUI_LOCATION}/autobk.bash" >> /etc/bash.bashrc
+source /etc/bash.bashrc
+
+echo -e "\nModifying MOTD"
+chmod -x /etc/update-motd.d/*
+ln -s ${GUI_LOCATION}/00-autobk /etc/update-motd.d/00-autobk
+chmod +x /etc/update-motd.d/00-autobk
+
 
 echo -e "Remove downloaded files"
 rm -f $SCRIPT_DIR/autobk-installer.sql
