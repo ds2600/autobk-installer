@@ -15,9 +15,9 @@ EOF
 set -e
 
 # Global variables
-AB_GET_URL="https://dev.ishiganto.com/autobk/autobk.zip"
-GUI_GET_URL="https://dev.ishiganto.com/autobk/cabgui.zip"
-SQL_GET_URL="https://dev.ishiganto.com/autobk/autobk-installer.sql"
+ABP_GET_URL="https://github.com/ds2600/autobk-p/archive/refs/tags/latest.zip"
+ABR_GET_URL="https://github.com/ds2600/autobk-r/archive/refs/tags/latest.zip"
+GUI_GET_URL="https://github.com/ds2600/autobk-controller/archive/refs/tags/latest.zip"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CFG_LOCATION="www/inc/config.php"
