@@ -66,6 +66,8 @@ wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
 # Install latest Node.js and npm
 nvm install node
 
+node -v >> $SCRIPT_DIR/install.log 2>&1
+
 # Install MariaDB server unless specified in .env
 if [ $INSTALL_DB == "yes" ]; then
 	echo -e "\nInstalling MariaDB"
