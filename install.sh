@@ -74,12 +74,10 @@ if [ $INSTALL_DB == "yes" ]; then
 	echo -e "\nConfiguring MariaDB"
 	# Set root password, delete anonymous users, delete remote root, delete test database, flush privileges
 	mysql -sfu root -Bse "UPDATE mysql.user SET Password=PASSWORD('${DB_ROOT_PWD}') WHERE User='root';DELETE FROM mysql.user WHERE User='';DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');DROP DATABASE IF EXISTS test;DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';FLUSH PRIVILEGES;" >> $SCRIPT_DIR/install.log 2>&1 &
-	spin
 	
 	# Create user as designated in the .env file
 	mysql -u root -p$DB_ROOT_PWD -Bse "CREATE USER '${SQL_UN}'@localhost IDENTIFIED BY '${SQL_PASS}';GRANT ALL PRIVILEGES ON *.* TO '${SQL_UN}'@localhost IDENTIFIED BY '${SQL_PASS}';FLUSH PRIVILEGES;" >> $SCRIPT_DIR/install.log 2>&1 &
-	spin
-
+	
 	# Create the AutoBk Database
 	echo "CREATE DATABASE AutoBk;" | mysql -u $SQL_UN -p$SQL_PASS
 
